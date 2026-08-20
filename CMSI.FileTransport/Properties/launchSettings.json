@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CMSI.FileTransport": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\CleanRoomFileTransport\\050726NMNYCLETTER_COMBINED.txt\""
+    }
+  }
+}
