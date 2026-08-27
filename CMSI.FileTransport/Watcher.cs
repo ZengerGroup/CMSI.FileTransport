@@ -186,8 +186,17 @@ namespace CMSI.FileTransport
                 string[] batches = Directory.GetDirectories(dir);
                 for (int i = 0; i < batches.Length; i++)
                 {
-                    if (SendToPrintFiles(batches[i])) MailSender.SendMail(Path.GetFileNameWithoutExtension(batches[i]));
-                    Archive(batches[i], "output");
+                    if (RecordCountsMatch(batches[i]))
+                    {
+                        if (SendToPrintFiles(batches[i])) MailSender.SendMail(Path.GetFileNameWithoutExtension(batches[i]));
+                        Archive(batches[i], "output");
+                    }
+                    else
+                    {
+                        string batchID = Path.GetFileName(batches[i]);
+                        MailSender.SendError("Record count does not match pdf count!");
+                        Directory.Move(batches[i], Path.Combine(Configurator.DailyBatches, batchID, String.Format("{0}_ERRORED", batchID)));
+                    }
                 }
             }
         }
@@ -235,6 +244,36 @@ namespace CMSI.FileTransport
                 return true;
             }
             catch { return false; }
+        }
+        private bool RecordCountsMatch(string dirPath)
+        {
+            try
+            {
+                int letterCount = Directory.GetFiles(dirPath).Length;
+                string batchID = Path.GetFileName(dirPath);
+                return letterCount == GetRecordCount(batchID);
+            }
+            catch { return false; }
+        }
+        private int GetRecordCount(string batchID)
+        {
+            try
+            {
+                StreamReader sReader = new StreamReader(Path.Combine(Configurator.DailyBatches, batchID, String.Format("{0}.txt", batchID)));
+                sReader.ReadLine();
+                int count = 0;
+                while (!sReader.EndOfStream)
+                {
+                    string line = sReader.ReadLine();
+                    if (line.Split(",").Length > 1) count++;
+                }
+                return count;
+            }
+            catch
+            {
+                Logger.WriteLog("Unable to determine record count for {0}.", false, batchID);
+                return -1;
+            }
         }
         //Shared
         private void Archive(string path, string type)

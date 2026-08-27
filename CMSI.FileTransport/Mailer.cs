@@ -54,6 +54,23 @@ namespace CMSI.FileTransport
                 if(failedAttempts < 5) RetrySendMail(batchID, failedAttempts);
             }
         }
+        public void SendError(string messageText)
+        {
+            try
+            {
+                MailAddress from = new MailAddress(Configurator.MailAccount);
+                MailAddress to = new MailAddress("Data@zenger.com");
+                MailMessage message = new MailMessage(from, to);
+                message.Subject = "CMS Email Error!";
+                message.Body = messageText;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+                Client.Send(message);
+            }
+            catch (Exception e)
+            {
+                Logger.WriteLog("Failed to send error email.", false);
+            }
+        }
         private SmtpClient ConfigureSMTP()
         {
             SmtpClient smtp = new SmtpClient("smtp.office365.com");
