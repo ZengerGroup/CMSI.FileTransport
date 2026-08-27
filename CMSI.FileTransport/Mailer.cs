@@ -30,7 +30,29 @@ namespace CMSI.FileTransport
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
                 Client.Send(Message);
             }
-            catch (Exception e) { Logger.WriteLog("Failed to send email report for batch {0}.\n {1}", false, batchID, e.Message); }
+            catch (Exception e) 
+            { 
+                Logger.WriteLog("Failed to send email report for batch {0}. Attempt 1 of 5.", false, batchID);
+                RetrySendMail(batchID, 1);
+            }
+        }
+        public void RetrySendMail(string batchID, int failedAttempts)
+        {
+            try
+            {
+                Message = ConfigureMessage(Configurator.MailRecipient);
+                Message.Subject = String.Format("CMS Email Individual PDF output - {0}.", batchID);
+                Message.Body = BuildMessage(batchID);
+                Attachment reportFile = GetReportAttachment(batchID);
+                if (reportFile != null) Message.Attachments.Add(reportFile);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+                Client.Send(Message);
+            }
+            catch (Exception e) 
+            { 
+                Logger.WriteLog("Failed to send email report for batch {0}. Attempt {1} of 5.", false, batchID, (++failedAttempts).ToString()); 
+                if(failedAttempts < 5) RetrySendMail(batchID, failedAttempts);
+            }
         }
         private SmtpClient ConfigureSMTP()
         {
