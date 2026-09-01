@@ -32,6 +32,7 @@ namespace CMSI.FileTransport
         }
         public static void ErrorExit(string[] message, int code)
         {
+            GenerateIssueJson("N/A", message[0], "Error");
             WriteLog(message[0], true);
             string longMessage = "";
             for (int i = 0; i < message.Length; i++)
@@ -50,6 +51,13 @@ namespace CMSI.FileTransport
         {
             Console.WriteLine(message, messageArgs);
             WriteLog(message, timestamp, messageArgs);
+        }
+        public static void GenerateIssueJson(string jobNumber, string message, string issueType)
+        {
+            string jsonString = String.Format("{\"JobNumber\":\"{0}\",\"IssueType\":\"{1}\",\"Message\":\"{2}\",\"AppName\":\"CMSI.FileTransport\",\"TimeStamp\":{3},\"ContactNeeded\":\"{4}\"",
+                jobNumber, issueType, message, DateTime.Now.ToString("MM-dd-yyyy_HH:mm:ss"), "CMSI team");
+            string jsonPath = Path.Combine(Configurator.IssueBank, String.Format("CMSI.FileTransport_{0}.json", DateTime.Now.ToString("MMddHHmm")));
+            File.AppendAllText(jsonPath, jsonString);
         }
     }
 }

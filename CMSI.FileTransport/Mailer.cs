@@ -50,8 +50,9 @@ namespace CMSI.FileTransport
             }
             catch (Exception e) 
             { 
-                Logger.WriteLog("Failed to send email report for batch {0}. Attempt {1} of 5.", false, batchID, (++failedAttempts).ToString()); 
-                if(failedAttempts < 5) RetrySendMail(batchID, failedAttempts);
+                Logger.WriteLog("Failed to send email report for batch {0}. Attempt {1} of 5.", false, batchID, (++failedAttempts).ToString());
+                if (failedAttempts < 5) RetrySendMail(batchID, failedAttempts);
+                else Logger.ErrorExit(["Unable to send email. Please check connection."], 100);
             }
         }
         public void SendError(string messageText)

@@ -195,6 +195,7 @@ namespace CMSI.FileTransport
                     {
                         string batchID = Path.GetFileName(batches[i]);
                         MailSender.SendError("Record count does not match pdf count!");
+                        Logger.GenerateIssueJson("N/A","Record count does not match PDF count.","Error");
                         Directory.Move(batches[i], Path.Combine(Configurator.DailyBatches, batchID, String.Format("{0}_ERRORED", batchID)));
                     }
                 }
@@ -313,7 +314,6 @@ namespace CMSI.FileTransport
                 case "output":
                     return Configurator.PSLArchive;
                 default:
-                    Logger.WriteLog("Howmst??", false);
                     return @"Z:\";
             }
         }

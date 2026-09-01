@@ -28,6 +28,7 @@ namespace CMSI.FileTransport
         public static string PrintFiles = ConfigurationManager.AppSettings["PrintFiles"];
         //Logging
         public static string LogPath = ConfigurationManager.AppSettings["LogPath"];
+        public static string IssueBank = ConfigurationManager.AppSettings["IssueBank"];
         //Working
         public static string Unzipped = ConfigurationManager.AppSettings["Unzipped"];
         //Email
